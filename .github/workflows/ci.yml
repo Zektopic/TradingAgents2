@@ -4,6 +4,7 @@ on:
   push:
     branches: [main, 'v[0-9]+.[0-9]+.[0-9]+']
   pull_request:
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -12,7 +13,7 @@ concurrency:
 jobs:
   test:
     name: tests (py${{ matrix.python-version }}${{ matrix.tz && format(', {0}', matrix.tz) || '' }})
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, manupa-hnx]
     strategy:
       fail-fast: false
       matrix:
@@ -25,6 +26,8 @@ jobs:
       TZ: ${{ matrix.tz }}
     steps:
       - uses: actions/checkout@v7
+      - name: Configure Git safe directory
+        run: git config --global --add safe.directory '*'
       - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
@@ -37,9 +40,11 @@ jobs:
 
   smoke-install:
     name: clean-install smoke
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, manupa-hnx]
     steps:
       - uses: actions/checkout@v7
+      - name: Configure Git safe directory
+        run: git config --global --add safe.directory '*'
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
@@ -53,9 +58,11 @@ jobs:
 
   lint:
     name: ruff (strict, full repo)
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, manupa-hnx]
     steps:
       - uses: actions/checkout@v7
+      - name: Configure Git safe directory
+        run: git config --global --add safe.directory '*'
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
